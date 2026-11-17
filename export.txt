@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Export Market Analysis System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#202b40}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#172238;color:white;padding:22px 14px;flex-shrink:0}
+.brand{font-size:20px;font-weight:bold;padding:10px;margin-bottom:25px}
+.brand span{color:#70a5ff}
+.nav-title{font-size:10px;color:#8593ad;letter-spacing:2px;padding:12px}
+.nav button{display:block;width:100%;padding:13px 12px;margin:3px 0;text-align:left;background:transparent;border:0;border-radius:7px;color:#b9c5da;cursor:pointer;font-size:13px}
+.nav button:hover,.nav button.active{background:#2d3c59;color:white}
+.main{flex:1;min-width:0}
+.topbar{height:65px;background:white;border-bottom:1px solid #e5e9f1;display:flex;justify-content:space-between;align-items:center;padding:0 25px;font-size:13px}
+.topbar span{color:#168967}
+.content{padding:28px;max-width:1450px;margin:auto}
+h1{font-size:26px;margin:0 0 8px}
+.subtitle{font-size:13px;color:#7c879a;margin-bottom:25px;line-height:1.6}
+.banner{padding:20px;border-radius:12px;color:white;margin:20px 0;background:linear-gradient(110deg,var(--accent),var(--accent2))}
+.banner h2{margin:0 0 7px;font-size:18px}
+.banner p{margin:0;font-size:12px;opacity:.9}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:20px 0}
+.card,.panel{background:white;border:1px solid #e5e9f1;border-radius:11px;box-shadow:0 5px 20px #1d2d4a08}
+.card{padding:18px}
+.card small{color:#7d899e;font-size:11px}
+.card strong{display:block;font-size:27px;margin:12px 0}
+.panel{margin:20px 0;overflow:hidden}
+.panel-head{padding:18px 20px;border-bottom:1px solid #e9edf4;font-size:14px;font-weight:bold}
+.panel-body{padding:20px}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th{text-align:left;background:#fafbfe;color:#7e899d;font-size:10px;letter-spacing:.7px;padding:13px}
+td{padding:14px 13px;border-top:1px solid #edf0f5;font-size:12px}
+.table-wrap{overflow-x:auto}
+button,.btn{cursor:pointer}
+.btn{padding:10px 14px;border:0;border-radius:7px;background:var(--accent);color:white;font-size:12px;font-weight:bold}
+.secondary{background:white;color:#38445a;border:1px solid #dfe4ed}
+input,select,textarea{padding:10px;border:1px solid #dfe4ed;border-radius:7px;width:100%;font-size:12px;background:white}
+label{font-size:11px;color:#657187;display:block;margin:0 0 7px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.field{margin-bottom:12px}
+.status{padding:5px 8px;border-radius:20px;background:#e5f7ef;color:#14815b;font-size:10px}
+.action{border:1px solid #e1e6ef;background:white;border-radius:5px;padding:6px 9px;font-size:11px}
+.barrow{display:grid;grid-template-columns:130px 1fr 35px;align-items:center;gap:10px;margin:18px 0;font-size:12px}
+.bar{height:8px;background:#e9edf5;border-radius:20px;overflow:hidden}
+.bar span{height:100%;display:block;background:var(--accent)}
+.notice{padding:12px;background:#fff5e7;color:#98651b;border-radius:7px;font-size:11px;line-height:1.6}
+.footer{text-align:center;font-size:10px;color:#939db0;padding:20px}
+@media(max-width:900px){.sidebar{width:200px}.cards{grid-template-columns:repeat(2,1fr)}.content{padding:18px}}
+@media(max-width:650px){.sidebar{width:58px;padding:10px 5px}.brand{font-size:0;padding:10px 3px}.brand span{font-size:19px}.nav-title{display:none}.nav button{font-size:0;text-align:center;padding:14px 3px}.nav button::first-letter{font-size:17px}.content{padding:14px}.cards{gap:8px}.card{padding:12px}.card strong{font-size:21px}.form-grid{grid-template-columns:1fr}.topbar{padding:0 12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">Export<span>Insight</span></div>
+  <div class="nav-title">WORKSPACE</div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="dashboard">▦ Dashboard</button>
+    <button data-page="users">♙ User Management</button>
+    <button data-page="products">▣ Product Management</button>
+    <button data-page="countries">◎ Country Management</button>
+    <button data-page="data">▤ Market Data Management</button>
+    <button data-page="analysis">◫ Market Analysis</button>
+    <button data-page="recommend">✦ Country Recommendation</button>
+    <button data-page="marketing">↗ Marketing Analysis</button>
+    <button data-page="reports">▧ Report Generation</button>
+    <button data-page="compare">⇄ Country Comparison</button>
+  </nav>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div>Workspace / <b id="crumb">Dashboard</b></div>
+    <span>● Demo environment</span>
+  </header>
+  <section class="content" id="content"></section>
+  <div class="footer">ExportInsight · Export Market Analysis and Country Recommendation System</div>
+</main>
+</div>
+<script>
+const themes={
+dashboard:["#3478f6","#7956d8"],users:["#7956d8","#a16be8"],
+products:["#168f88","#38b6a3"],countries:["#7659cf","#a47ae5"],
+data:["#e38a2e","#f2b64b"],analysis:["#3478f6","#36a7db"],
+recommend:["#159a70","#49bd91"],marketing:["#d65c74","#f09a83"],
+reports:["#5867d9","#8c79ec"],compare:["#168eaa","#48c0c4"]
+};
+const titles={
+dashboard:"Dashboard",users:"User Management",products:"Product Management",
+countries:"Country Management",data:"Market Data Management",
+analysis:"Market Analysis",recommend:"Country Recommendation",
+marketing:"Marketing Analysis",reports:"Report Generation",compare:"Country Comparison"
+};
+let page="dashboard";
+let users=[
+{name:"Aarav Kumar",email:"aarav@example.com",role:"Exporter",status:"Active"},
+{name:"Meera Sharma",email:"meera@example.com",role:"Analyst",status:"Active"},
+{name:"Admin User",email:"admin@example.com",role:"Administrator",status:"Active"}
+];
+let products=[
+{name:"Organic Cotton T-Shirts",category:"Textiles",hs:"610910",price:8.5},
+{name:"Moringa Powder",category:"Agriculture",hs:"121190",price:5.2},
+{name:"Brass Lamps",category:"Home Decor",hs:"940550",price:24},
+{name:"Coir Garden Pots",category:"Eco-friendly",hs:"681099",price:3.8}
+];
+let countries=[
+{name:"United States",region:"North America",currency:"USD",tariff:4.5},
+{name:"Germany",region:"Europe",currency:"EUR",tariff:3.2},
+{name:"United Arab Emirates",region:"Middle East",currency:"AED",tariff:5},
+{name:"Japan",region:"East Asia",currency:"JPY",tariff:6.1},
+{name:"Australia",region:"Oceania",currency:"AUD",tariff:3.8},
+{name:"Singapore",region:"Southeast Asia",currency:"SGD",tariff:2.4}
+];
+let market=[
+{country:"United States",product:"Organic Cotton T-Shirts",demand:88,growth:76,competition:63,friendly:72},
+{country:"Germany",product:"Organic Cotton T-Shirts",demand:82,growth:71,competition:57,friendly:85},
+{country:"United Arab Emirates",product:"Moringa Powder",demand:74,growth:80,competition:48,friendly:78},
+{country:"Japan",product:"Brass Lamps",demand:69,growth:66,competition:51,friendly:71},
+{country:"Australia",product:"Coir Garden Pots",demand:79,growth:73,competition:42,friendly:82},
+{country:"Singapore",product:"Moringa Powder",demand:72,growth:75,competition:46,friendly:88},
+{country:"Germany",product:"Coir Garden Pots",demand:77,growth:70,competition:44,friendly:85}
+];
+
+const score=d=>Math.round(d.demand*.32+d.growth*.25+(100-d.competition)*.20+d.friendly*.23);
+const money=n=>"$"+Number(n).toFixed(2);
+const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function go(p){if(!titles[p])return;page=p;render()}
+document.getElementById("nav").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-page]");
+  if(b)go(b.dataset.page);
+});
+
+function banner(text){return `<div class="banner"><h2>${titles[page]}</h2><p>${text}</p></div>`}
+function stat(label,value,note){return `<div class="card"><small>${label}</small><strong>${value}</strong><small>${note}</small></div>`}
+function panel(title,body){return `<div class="panel"><div class="panel-head">${title}</div>${body}</div>`}
+function table(headers,rows){return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`}
+function addButton(label,fn){return `<button class="btn" onclick="${fn}">＋ ${label}</button>`}
+
+function dashboard(){
+  const sorted=[...market].sort((a,b)=>score(b)-score(a));
+  return `<h1>Export intelligence overview</h1>
+  <p class="subtitle">Monitor export opportunities, products, and country-market data from one workspace.</p>
+  <div class="cards">
+    ${stat("Registered users",users.length,"Accounts in the system")}
+    ${stat("Products tracked",products.length,"Product catalogue")}
+    ${stat("Countries monitored",countries.length,"Destination markets")}
+    ${stat("Average suitability",Math.round(market.reduce((s,d)=>s+score(d),0)/market.length)+"/100","Illustrative demo score")}
+  </div>
+  <div class="panel">
+    <div class="panel-head">Market suitability by destination</div>
+    <div class="panel-body">
+      ${countries.map(c=>{
+        const ds=market.filter(d=>d.country===c.name);
+        const v=ds.length?Math.round(ds.reduce((s,d)=>s+score(d),0)/ds.length):0;
+        return `<div class="barrow"><span>${safe(c.name)}</span><div class="bar"><span style="width:${v}%"></span></div><b>${v}</b></div>`;
+      }).join("")}
+    </div>
+  </div>
+  ${panel("Top export opportunities",table(
+    ["Country","Product","Demand","Growth","Suitability"],
+    sorted.slice(0,5).map(d=>`<tr><td>${safe(d.country)}</td><td>${safe(d.product)}</td><td>${d.demand}%</td><td>${d.growth}%</td><td><b>${score(d)}/100</b></td></tr>`).join("")
+  ))}`;
+}
+
+function usersPage(){
+  return `${banner("Manage system accounts, roles, and access status.")}
+  <div class="cards">
+    ${stat("Total users",users.length,"Registered accounts")}
+    ${stat("Active users",users.filter(u=>u.status==="Active").length,"Enabled accounts")}
+    ${stat("Access roles",new Set(users.map(u=>u.role)).size,"Role types")}
+    ${stat("Pending",users.filter(u=>u.status!=="Active").length,"Awaiting activation")}
+  </div>
+  ${addButton("Add User","addRecord('users')")}
+  ${panel("User directory",`<div class="panel-body">${table(
+    ["Name","Email","Role","Status","Action"],
+    users.map((u,i)=>`<tr><td><b>${safe(u.name)}</b></td><td>${safe(u.email)}</td><td>${safe(u.role)}</td><td><span class="status">${safe(u.status)}</span></td><td><button class="action" onclick="removeRecord('users',${i})">Delete</button></td></tr>`).join("")
+  )}</div>`)}`;
+}
+
+function productsPage(){
+  return `${banner("Maintain products that will be evaluated for export opportunities.")}
+  <div class="cards">
+    ${stat("Total products",products.length,"Registered products")}
+    ${stat("Categories",new Set(products.map(p=>p.category)).size,"Product groups")}
+    ${stat("Average price",money(products.reduce((s,p)=>s+p.price,0)/products.length),"Sample unit price")}
+    ${stat("HS codes",new Set(products.map(p=>p.hs)).size,"Customs classification")}
+  </div>
+  ${addButton("Add Product","addRecord('products')")}
+  ${panel("Product catalogue",`<div class="panel-body">${table(
+    ["Product","Category","HS Code","Unit Price","Action"],
+    products.map((p,i)=>`<tr><td><b>${safe(p.name)}</b></td><td>${safe(p.category)}</td><td>${safe(p.hs)}</td><td>${money(p.price)}</td><td><button class="action" onclick="removeRecord('products',${i})">Delete</button></td></tr>`).join("")
+  )}</div>`)}`;
+}
+
+function countriesPage(){
+  return `${banner("Maintain destination countries and key trade-market details.")}
+  <div class="cards">
+    ${stat("Countries",countries.length,"Destination records")}
+    ${stat("Regions",new Set(countries.map(c=>c.region)).size,"Regions covered")}
+    ${stat("Currencies",new Set(countries.map(c=>c.currency)).size,"Currency types")}
+    ${stat("Trade profiles",countries.length,"Sample profiles")}
+  </div>
+  ${addButton("Add Country","addRecord('countries')")}
+  ${panel("Destination country registry",`<div class="panel-body">${table(
+    ["Country","Region","Currency","Indicative Tariff","Action"],
+    countries.map((c,i)=>`<tr><td><b>${safe(c.name)}</b></td><td>${safe(c.region)}</td><td>${safe(c.currency)}</td><td>${c.tariff}%</td><td><button class="action" onclick="removeRecord('countries',${i})">Delete</button></td></tr>`).join("")
+  )}</div>`)}`;
+}
+
+function dataPage(){
+  return `${banner("Maintain market indicators used by the analysis and recommendation process.")}
+  <div class="cards">
+    ${stat("Market records",market.length,"Product-country pairs")}
+    ${stat("Average demand",Math.round(market.reduce((s,d)=>s+d.demand,0)/market.length)+"%","Sample index")}
+    ${stat("Average growth",Math.round(market.reduce((s,d)=>s+d.growth,0)/market.length)+"%","Sample index")}
+    ${stat("Indicators",4,"Demand, growth, competition, import friendliness")}
+  </div>
+  ${addButton("Add Market Data","addRecord('data')")}
+  ${panel("Market data registry",`<div class="panel-body">
+    <div class="notice">Sample values are for demonstration only. Replace them with verified market data before real business use.</div><br>
+    ${table(["Country","Product","Demand","Growth","Competition","Import Friendliness","Action"],
+      market.map((d,i)=>`<tr><td>${safe(d.country)}</td><td>${safe(d.product)}</td><td>${d.demand}%</td><td>${d.growth}%</td><td>${d.competition}%</td><td>${d.friendly}%</td><td><button class="action" onclick="removeRecord('market',${i})">Delete</button></td></tr>`).join("")
+    )}
+  </div>`)}`;
+}
+
+function analysisPage(){
+  const sorted=[...market].sort((a,b)=>score(b)-score(a));
+  return `${banner("Analyze product demand, market growth, competition, and suitability.")}
+  <div class="cards">
+    ${stat("Records analyzed",market.length,"Sample data rows")}
+    ${stat("High suitability",market.filter(d=>score(d)>=75).length,"Score 75 or higher")}
+    ${stat("Average suitability",Math.round(market.reduce((s,d)=>s+score(d),0)/market.length)+"/100","Weighted score")}
+    ${stat("Top score",score(sorted[0])+"/100",sorted[0].country)}
+  </div>
+  ${panel("Suitability analysis",`<div class="panel-body">
+    ${sorted.map(d=>`<div class="barrow"><span>${safe(d.country)}</span><div class="bar"><span style="width:${score(d)}%"></span></div><b>${score(d)}</b></div>`).join("")}
+    <div class="notice">Demo formula: demand 32% + growth 25% + (100 − competition) 20% + import friendliness 23%. This is an illustrative score, not a profit prediction.</div>
+  </div>`)}
+  ${panel("Analysis results",`<div class="panel-body">${table(
+    ["Product","Country","Demand","Growth","Competition","Score","Assessment"],
+    sorted.map(d=>`<tr><td>${safe(d.product)}</td><td>${safe(d.country)}</td><td>${d.demand}%</td><td>${d.growth}%</td><td>${d.competition}%</td><td><b>${score(d)}/100</b></td><td>${score(d)>=75?"Promising":"Review market"}</td></tr>`).join("")
+  )}</div>`)}`;
+}
+
+function recommendPage(){
+  const sorted=[...market].sort((a,b)=>score(b)-score(a));
+  return `${banner("Rank suitable export destinations using the current sample market indicators.")}
+  <div class="cards">
+    ${stat("Best sample match",sorted[0].country,"Highest scored opportunity")}
+    ${stat("Suitability score",score(sorted[0])+"/100","Weighted demo score")}
+    ${stat("Promising markets",market.filter(d=>score(d)>=75).length,"Score 75 or higher")}
+    ${stat("Products assessed",new Set(market.map(d=>d.product)).size,"Product types")}
+  </div>
+  ${panel("Ranked country recommendations",`<div class="panel-body">${table(
+    ["Rank","Country","Product","Demand","Growth","Suitability"],
+    sorted.map((d,i)=>`<tr><td>#${i+1}</td><td><b>${safe(d.country)}</b></td><td>${safe(d.product)}</td><td>${d.demand}%</td><td>${d.growth}%</td><td><b>${score(d)}/100</b></td></tr>`).join("")
+  )}</div>`)}`;
+}
+
+function marketingPage(){
+  return `${banner("Prepare marketing suggestions for a product and destination country.")}
+  <div class="panel">
+    <div class="panel-head">Marketing strategy builder</div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div><label>PRODUCT</label><select id="mkproduct">${[...new Set(market.map(d=>d.product))].map(p=>`<option>${safe(p)}</option>`).join("")}</select></div>
+        <div><label>DESTINATION COUNTRY</label><select id="mkcountry">${countries.map(c=>`<option>${safe(c.name)}</option>`).join("")}</select></div>
+      </div>
+      <br><button class="btn" onclick="showMarketing()">Generate Strategy</button>
+      <div id="mkresult"></div>
+    </div>
+  </div>`;
+}
+
+function showMarketing(){
+  const p=document.getElementById("mkproduct").value;
+  const c=document.getElementById("mkcountry").value;
+  const plans={
+    "Germany":["Specialty retailers, trade fairs, and B2B distributors","Emphasize sustainability, quality, and compliance","Eco-conscious consumers and import distributors"],
+    "United States":["Online marketplaces and direct-to-consumer sales","Highlight product value, quality, and certifications","Specialty retailers and online shoppers"],
+    "Australia":["Garden centres, eco-retailers, and online channels","Highlight natural materials and practical benefits","Home gardeners and sustainable-living shoppers"],
+    "Japan":["Local importers, niche retailers, and e-commerce","Focus on craftsmanship, quality, and packaging","Specialty shops and quality-conscious customers"],
+    "Singapore":["E-commerce and regional distributors","Present concise product benefits and clear information","Urban consumers and regional trade buyers"],
+    "United Arab Emirates":["Regional distributors and retail channels","Use premium presentation and clear product origin","Retailers and specialist buyers"]
+  };
+  const a=plans[c]||plans.Germany;
+  document.getElementById("mkresult").innerHTML=`<div class="banner" style="margin-top:22px"><h2>${safe(p)} — ${safe(c)}</h2><p>Sample marketing strategy</p></div>
+  <div class="cards">${stat("Suggested channels",a[0],"Potential distribution options")}${stat("Positioning",a[1],"Proposed value message")}${stat("Target audience",a[2],"Audience to validate")}${stat("Next step","Validate","Research local rules and prices")}</div>
+  <div class="notice">These are initial suggestions, not verified market research. Confirm customer preferences, labelling, import requirements, shipping costs, and competitor pricing.</div>`;
+}
+
+function reportsPage(){
+  return `${banner("Create downloadable summaries of product and country-market information.")}
+  <div class="cards">
+    ${stat("Products",products.length,"Included in system")}
+    ${stat("Countries",countries.length,"Destination records")}
+    ${stat("Market records",market.length,"Analysis inputs")}
+    ${stat("Formats","CSV / TXT","Download formats")}
+  </div>
+  <div class="panel">
+    <div class="panel-head">Generate report</div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div><label>REPORT TYPE</label><select id="reporttype">
+          <option value="summary">Executive Market Summary</option>
+          <option value="market">Market Analysis</option>
+          <option value="recommend">Country Recommendations</option>
+          <option value="products">Product Catalogue</option>
+          <option value="countries">Country Directory</option>
+        </select></div>
+        <div><label>FILE FORMAT</label><select id="reportformat"><option value="csv">CSV Spreadsheet</option><option value="txt">Text File</option></select></div>
+      </div>
+      <br><button class="btn" onclick="downloadReport()">⇩ Generate and Download</button>
+    </div>
+  </div>
+  <div class="notice">Reports use demo data. Replace sample values with verified information before making export decisions.</div>`;
+}
+
+function comparePage(){
+  return `${banner("Compare destination markets using common market indicators.")}
+  <div class="panel">
+    <div class="panel-head">Select countries</div>
+    <div class="panel-body">
+      <div class="form-grid">${[1,2,3].map(n=>`<div><label>COUNTRY ${n}</label><select id="cmp${n}"><option value="">Choose country</option>${countries.map(c=>`<option ${((n===1&&c.name==="Germany")||(n===2&&c.name==="Australia"))?"selected":""}>${safe(c.name)}</option>`).join("")}</select></div>`).join("")}</div>
+      <br><button class="btn" onclick="compareCountries()">Compare Markets</button>
+      <div id="cmpresult"></div>
+    </div>
+  </div>`;
+}
+
+function compareCountries(){
+  const names=[1,2,3].map(i=>document.getElementById("cmp"+i).value).filter((x,i,a)=>x&&a.indexOf(x)===i);
+  const metrics=[["Demand","demand"],["Growth","growth"],["Competition","competition"],["Import friendliness","friendly"],["Suitability score","score"]];
+  document.getElementById("cmpresult").innerHTML=panel("Comparison results",`<div class="panel-body">${table(
+    ["Indicator",...names],
+    metrics.map(([label,key])=>`<tr><td><b>${label}</b></td>${names.map(n=>{
+      const ds=market.filter(d=>d.country===n);
+      const v=ds.length?Math.round(ds.reduce((s,d)=>s+(key==="score"?score(d):d[key]),0)/ds.length):"No data";
+      return `<td>${v==="No data"?v:v+(key==="score"?"/100":"%")}</td>`;
+    }).join("")}</tr>`).join("")
+  )}<p class="subtitle">Missing data means there are no sample records for that country; it does not mean poor performance.</p></div>`);
+}
+
+function addRecord(type){
+  const fieldDefinitions={
+    users:[["name","Full name"],["email","Email"],["role","Role"]],
+    products:[["name","Product name"],["category","Category"],["hs","HS code"],["price","Unit price"]],
+    countries:[["name","Country name"],["region","Region"],["currency","Currency"],["tariff","Indicative tariff"]],
+    data:[["country","Country"],["product","Product"],["demand","Demand (0–100)"],["growth","Growth (0–100)"],["competition","Competition (0–100)"],["friendly","Import friendliness (0–100)"]]
+  };
+  const fields=fieldDefinitions[type];
+  if(!fields){alert("Unknown record type.");return;}
+
+  const form=`<form id="newform"><div class="form-grid">${fields.map(([key,label])=>`
+    <div class="field"><label>${label.toUpperCase()}</label>
+    ${type==="data"&&(key==="country"||key==="product")
+      ?`<select name="${key}">${(key==="country"?countries.map(c=>c.name):products.map(p=>p.name)).map(x=>`<option>${safe(x)}</option>`).join("")}</select>`
+      :`<input name="${key}" ${["price","tariff","demand","growth","competition","friendly"].includes(key)?'type="number" step="any" min="0" max="100"':'type="text"'} required>`}
+    </div>`).join("")}</div>
+    <br><button class="btn" type="submit">Save Record</button>
+    <button class="btn secondary" type="button" onclick="document.getElementById('newform').remove()">Cancel</button>
+  </form>`;
+
+  const host=document.getElementById("content");
+  const old=document.getElementById("newform");
+  if(old)old.closest(".panel")?.remove();
+
+  const box=document.createElement("div");
+  box.className="panel";
+  box.innerHTML=`<div class="panel-head">Add New Record</div><div class="panel-body">${form}</div>`;
+  host.prepend(box);
+
+  document.getElementById("newform").addEventListener("submit",e=>{
+    e.preventDefault();
+    const d=Object.fromEntries(new FormData(e.target).entries());
+
+    if(type==="users"){
+      users.push({...d,status:"Active"});
+    }else if(type==="products"){
+      d.price=Number(d.price);
+      products.push(d);
+    }else if(type==="countries"){
+      d.tariff=Number(d.tariff);
+      countries.push(d);
+    }else if(type==="data"){
+      ["demand","growth","competition","friendly"].forEach(k=>d[k]=Math.min(100,Number(d[k])));
+      market.push(d);
+    }
+    render();
+  });
+}
+
+function removeRecord(type,i){
+  if(!confirm("Delete this record?"))return;
+  if(type==="users")users.splice(i,1);
+  if(type==="products")products.splice(i,1);
+  if(type==="countries")countries.splice(i,1);
+  if(type==="market")market.splice(i,1);
+  render();
+}
+
+function downloadReport(){
+  const type=document.getElementById("reporttype").value;
+  const format=document.getElementById("reportformat").value;
+  let rows=[],filename=type;
+
+  if(type==="products"){
+    rows=[["Product","Category","HS code","Unit price"],...products.map(p=>[p.name,p.category,p.hs,p.price])];
+  }else if(type==="countries"){
+    rows=[["Country","Region","Currency","Indicative tariff"],...countries.map(c=>[c.name,c.region,c.currency,c.tariff])];
+  }else if(type==="market"){
+    rows=[["Country","Product","Demand","Growth","Competition","Import friendliness","Score"],...market.map(d=>[d.country,d.product,d.demand,d.growth,d.competition,d.friendly,score(d)])];
+  }else if(type==="recommend"){
+    rows=[["Rank","Country","Product","Suitability"],...[...market].sort((a,b)=>score(b)-score(a)).map((d,i)=>[i+1,d.country,d.product,score(d)])];
+  }else{
+    rows=[["ExportInsight Executive Market Summary"],["Users",users.length],["Products",products.length],["Countries",countries.length],["Market records",market.length],[],["Rank","Country","Product","Suitability"],...[...market].sort((a,b)=>score(b)-score(a)).map((d,i)=>[i+1,d.country,d.product,score(d)])];
+  }
+
+  const text=rows.map(r=>r.map(v=>format==="csv"?'"'+String(v??"").replace(/"/g,'""')+'"':String(v??"")).join(format==="csv"?",":" | ")).join("\r\n");
+  const blob=new Blob(["\ufeff"+text],{type:format==="csv"?"text/csv;charset=utf-8":"text/plain;charset=utf-8"});
+  const a=document.createElement("a");
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download="exportinsight-"+filename+"."+format;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function render(){
+  const [a,b]=themes[page];
+  document.documentElement.style.setProperty("--accent",a);
+  document.documentElement.style.setProperty("--accent2",b);
+  document.getElementById("crumb").textContent=titles[page];
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+  const views={dashboard,users:usersPage,products:productsPage,countries:countriesPage,data:dataPage,analysis:analysisPage,recommend:recommendPage,marketing:marketingPage,reports:reportsPage,compare:comparePage};
+  document.getElementById("content").innerHTML=views[page]();
+}
+
+render();
+</script>
+</body>
+</html>
